@@ -1,0 +1,313 @@
+/* ============================================
+   LoginPage.module.css
+   Dark monospace theme — mirrors AddRecordForm
+   ============================================ */
+
+/* ─── Coloring Scheme ────────────────────────────────────── */
+:root {
+  --bg-page:        #1a1a1a;
+  --bg-card:        #252525;
+  --bg-input:       #2e2e2e;
+  --border-default: #3a3a3a;
+  --border-focus:   #5bb8e8;
+  --accent:         #5bb8e8;
+  --accent-badge-bg:#1e3a4f;
+  --accent-badge-bd:#2a5070;
+  --text-primary:   #f0f0f0;
+  --text-secondary: #aaa;
+  --text-muted:     #555;
+  --text-placeholder:#555;
+  --divider:        #333;
+  --btn-primary-bg: #f0f0f0;
+  --btn-primary-txt:#1a1a1a;
+  --font-mono:      "IBM Plex Mono", "Fira Code", "Courier New", monospace;
+}
+
+/* ─── Page Wrapper ───────────────────────────────────────── */
+.overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  font-family: var(--font-mono);
+}
+
+/* ─── Card ───────────────────────────────────────────────── */
+.card {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 36px 40px 32px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  animation: cardIn 0.35s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+.header {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+
+.subtitle {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background-color: var(--accent-badge-bg);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--accent-badge-bd);
+  letter-spacing: 0.5px;
+}
+
+/* ─── Divider ────────────────────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--divider);
+  margin: 0 0 24px;
+}
+
+/* ─── Form ───────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── Field ───────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ─── Input ──────────────────────────────────────────────── */
+.input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 10px 13px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(91, 184, 232, 0.12);
+}
+
+/* Validation states */
+.input.inputError {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+}
+
+.input.inputSuccess {
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+/* ─── Status Message ─────────────────────────────────────── */
+.statusMsg {
+  font-size: 0.75rem;
+  letter-spacing: 0.3px;
+  min-height: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.statusMsg.error   { color: #e74c3c; }
+.statusMsg.success { color: #2ecc71; }
+.statusMsg.loading { color: var(--text-secondary); }
+
+/* ─── Footer ─────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20px;
+  border-top: 1px solid var(--divider);
+  gap: 12px;
+}
+
+.footerHint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.footerHint .accent {
+  color: var(--accent);
+}
+
+/* ─── Buttons ────────────────────────────────────────────── */
+.btnLogin {
+  background-color: var(--btn-primary-bg);
+  border: none;
+  border-radius: 6px;
+  color: var(--btn-primary-txt);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  font-weight: 700;
+  padding: 9px 22px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+}
+
+.btnLogin:hover:not(:disabled) {
+  background-color: #fff;
+}
+
+.btnLogin:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btnLogin:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── Add Record Button (Post Login) ─────────────────────── */
+.addRecordWrap {
+  margin-top: 4px;
+  animation: fadeSlideIn 0.4s ease both;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.addRecordInfo {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.addRecordInfo .dot {
+  width: 6px;
+  height: 6px;
+  background: #2ecc71;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
+  flex-shrink: 0;
+}
+
+.btnAddRecord {
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #777;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  font-weight: 600;
+  padding: 11px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.btnAddRecord:hover {
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+  background-color: rgba(91, 184, 232, 0.05);
+}
+
+.btnAddRecord .btnRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.btnAddRecord:hover .btnRight {
+  color: var(--accent);
+}
+
+/* ─── Spinner ────────────────────────────────────────────── */
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #555;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Responsiveness ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 20px 24px;
+    border-radius: 0;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btnLogin {
+    width: 100%;
+    justify-content: center;
+  }
+}

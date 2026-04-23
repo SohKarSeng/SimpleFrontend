@@ -1,243 +1,185 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import styles from './styling/lobby.module.css';
+import { useRouter } from "next/navigation";
+import styles from "./styling/login.module.css";
 
-type Status = "active" | "inactive" | "pending";
 
-interface FormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  age: string;
-  category: string;
-  status: Status;
-  notes: string;
+const MOCK_EMAILS = [
+  "john.doe@example.com",
+  "jane.smith@example.com",
+  "admin@company.com",
+];
+
+async function checkEmailInDatabase(email: string) {
+  // Simulate network latency
+  await new Promise((r) => setTimeout(r, 900));
+  return MOCK_EMAILS.includes(email.trim().toLowerCase());
 }
 
-export default function AddRecordPage() {
-  const [form, setForm] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    age: "",
-    category: "",
-    status: "active",
-    notes: "",
-  });
+const STATE = {
+  IDLE: "idle",
+  LOADING: "loading",
+  SUCCESS: "success",
+  ERROR: "error",
+};
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [loginState, setLoginState] = useState(STATE.IDLE);
+  const [message, setMessage] = useState("");
 
-  const handleStatusChange = (value: Status) => {
-    setForm((prev) => ({ ...prev, status: value }));
-  };
+  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isLoading = loginState === STATE.LOADING;
+  const isLoggedIn = loginState === STATE.SUCCESS;
 
-  const handleClear = () => {
-    setForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      age: "",
-      category: "",
-      status: "active",
-      notes: "",
-    });
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!isValidEmail || isLoading) return;
 
-    // POST to submit.php — mirrors the PHP $_POST behavior shown in the design
-    const body = new URLSearchParams({
-      first_name: form.firstName,
-      last_name: form.lastName,
-      email: form.email,
-      age: form.age,
-      category: form.category,
-      status: form.status,
-      notes: form.notes,
-    });
+    setLoginState(STATE.LOADING);
+    setMessage("");
 
-    try {
-      const res = await fetch("/submit.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: body.toString(),
-      });
+    const found = await checkEmailInDatabase(email);
 
-      if (res.ok) {
-        alert("Record submitted successfully!");
-        handleClear();
-      } else {
-        alert(`Server responded with status ${res.status}`);
-      }
-    } catch (err) {
-      alert(`Request failed: ${err}`);
+    if (found) {
+      setLoginState(STATE.SUCCESS);
+      setMessage(`Access granted for ${email}`);
+    } else {
+      setLoginState(STATE.ERROR);
+      setMessage("No account found with that email address.");
     }
-  };
+  }
+
+  function handleEmailChange(e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >) {
+    setEmail(e.target.value);
+    // Reset error when user starts typing again
+    if (loginState === STATE.ERROR) {
+      setLoginState(STATE.IDLE);
+      setMessage("");
+    }
+  }
+
+  function handleGoToAddRecord() {
+    router.push("/add-record"); // adjust route as needed
+  }
+
+  /* Derive input style variant */
+  const inputClass = [
+    styles.input,
+    loginState === STATE.ERROR && styles.inputError,
+    loginState === STATE.SUCCESS && styles.inputSuccess,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className={styles.page}>
+    <div className={styles.overlay}>
       <div className={styles.card}>
- 
-        {/* ── Header ── */}
-        <h1 className={styles.cardTitle}>Add new record</h1>
-        <p className={styles.cardSubtitle}>
-          Fields map directly to your PHP{" "}
-          <span className={styles.codeTag}>$_POST</span> variables
-        </p>
- 
+        {/* ---- Header ---- */}
+        <div className={styles.header}>
+          <h1 className={styles.title}>Sign in</h1>
+          <p className={styles.subtitle}>
+            Enter your email to look up your{" "}
+            <span className={styles.badge}>$_SESSION</span> record
+          </p>
+        </div>
+
         <hr className={styles.divider} />
- 
-        <form onSubmit={handleSubmit} noValidate>
- 
-          {/* ── Name Row ── */}
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="firstName">First Name</label>
-              <input
-                className={styles.input}
-                id="firstName"
-                type="text"
-                name="firstName"
-                placeholder="e.g. John"
-                value={form.firstName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="lastName">Last Name</label>
-              <input
-                className={styles.input}
-                id="lastName"
-                type="text"
-                name="lastName"
-                placeholder="e.g. Doe"
-                value={form.lastName}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
- 
-          {/* ── Email ── */}
+
+        {/* ---- Form ---- */}
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {/* Email field */}
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="email">Email Address</label>
+            <label className={styles.label} htmlFor="email">
+              Email Address
+            </label>
             <input
-              className={styles.input}
               id="email"
-              type="email"
               name="email"
-              placeholder="john@example.com"
-              value={form.email}
-              onChange={handleChange}
+              type="email"
+              className={inputClass}
+              placeholder="you@example.com"
+              value={email}
+              onChange={handleEmailChange}
+              autoComplete="email"
+              disabled={isLoggedIn}
+              aria-describedby="email-status"
             />
-          </div>
- 
-          {/* ── Age & Category Row ── */}
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="age">Age</label>
-              <input
-                className={styles.input}
-                id="age"
-                type="number"
-                name="age"
-                placeholder="25"
-                min={0}
-                max={150}
-                value={form.age}
-                onChange={handleChange}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="category">Category</label>
-              <select
-                className={styles.select}
-                id="category"
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-              >
-                <option value="">Select...</option>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-                <option value="moderator">Moderator</option>
-                <option value="guest">Guest</option>
-              </select>
-            </div>
-          </div>
- 
-          {/* ── Status ── */}
-          <div className={styles.field}>
-            <label className={styles.label}>Status</label>
-            <div className={styles.radioGroup}>
-              {(["active", "inactive", "pending"] as Status[]).map((s) => (
-                <label key={s} className={styles.radioLabel}>
-                  <input
-                    className={styles.radioInput}
-                    type="radio"
-                    name="status"
-                    value={s}
-                    checked={form.status === s}
-                    onChange={() => handleStatusChange(s)}
-                  />
-                  {s.toUpperCase()}
-                </label>
-              ))}
-            </div>
-          </div>
- 
-          {/* ── Notes ── */}
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="notes">Notes</label>
-            <textarea
-              className={styles.textarea}
-              id="notes"
-              name="notes"
-              placeholder="Optional notes about this record..."
-              value={form.notes}
-              onChange={handleChange}
-            />
-          </div>
- 
-          <hr className={styles.divider} />
- 
-          {/* ── Footer ── */}
-          <div className={styles.footer}>
-            <span className={styles.postHint}>
-              POST →{" "}
-              <a href="/submit.php" target="_blank" rel="noopener noreferrer">
-                submit.php
-              </a>
+
+            {/* Inline status message */}
+            <span
+              id="email-status"
+              className={[
+                styles.statusMsg,
+                loginState === STATE.ERROR && styles.error,
+                loginState === STATE.SUCCESS && styles.success,
+                loginState === STATE.LOADING && styles.loading,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-live="polite"
+            >
+              {loginState === STATE.LOADING && (
+                <>
+                  <span className={styles.spinner} /> Searching database…
+                </>
+              )}
+              {message && loginState !== STATE.LOADING && (
+                <>
+                  {loginState === STATE.ERROR ? "✗" : "✓"} {message}
+                </>
+              )}
             </span>
-            <div className={styles.btnGroup}>
-              <button
-                type="button"
-                className={`${styles.btn} ${styles.btnClear}`}
-                onClick={handleClear}
-              >
-                Clear
-              </button>
-              <button
-                type="submit"
-                className={`${styles.btn} ${styles.btnSubmit}`}
-              >
-                Submit record
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
-              </button>
-            </div>
           </div>
- 
+
+          {/* Footer row: hint + button */}
+          <div className={styles.footer}>
+            <span className={styles.footerHint}>
+              POST <span className={styles.accent}>→</span>{" "}
+              <span className={styles.accent}>auth.php</span>
+            </span>
+
+            <button
+              type="submit"
+              className={styles.btnLogin}
+              disabled={!isValidEmail || isLoading || isLoggedIn}
+            >
+              {isLoading ? (
+                <>
+                  <span className={styles.spinner} /> Checking…
+                </>
+              ) : isLoggedIn ? (
+                <>✓ Verified</>
+              ) : (
+                <>Look up email ↗</>
+              )}
+            </button>
+          </div>
         </form>
+
+        {/* ---- Post-login: Add Record button ---- */}
+        {isLoggedIn && (
+          <div className={styles.addRecordWrap}>
+            <p className={styles.addRecordInfo}>
+              <span className={styles.dot} />
+              Session active — you may now add a new record
+            </p>
+            <button
+              type="button"
+              className={styles.btnAddRecord}
+              onClick={handleGoToAddRecord}
+            >
+              <span>Add new record</span>
+              <span className={styles.btnRight}>
+                /add-record <span>↗</span>
+              </span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
