@@ -14,16 +14,27 @@ $methods = $_SERVER['REQUEST_METHOD'];
 if ($methods === 'GET') {
     $getEmail = $_GET['email'] ?? null;
 
-    if (!$email) {
+    if (!$getEmail) {
         http_response_code(400);
         echo json_encode(['error' => 'Email Is Required']);
         exit;
     }
 
     try {
+        $link = new PDO(
+            'mysql:host=localhost;dbname=mysqldb;charset=utf8mb4',
+            'admin',
+            '021@29',
+
+            array(
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_PERSISTENT => false
+            )
+        );
+        
         $stmt = $link->prepare("SELECT Email FROM UserInformation WHERE Email = :email");
         $stmt->execute([':email' => $getEmail]);
-        $getUser = $stmt->fetch(POD::FETCH_ASSOC);
+        $getUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($getUser) {
             echo json_encode($getUser);

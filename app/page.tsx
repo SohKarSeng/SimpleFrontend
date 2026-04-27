@@ -4,17 +4,14 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styling/login.module.css";
 
-
-const MOCK_EMAILS = [
-  "john.doe@example.com",
-  "jane.smith@example.com",
-  "admin@company.com",
-];
-
 async function checkEmailInDatabase(email: string) {
-  // Simulate network latency
-  await new Promise((r) => setTimeout(r, 900));
-  return MOCK_EMAILS.includes(email.trim().toLowerCase());
+  const res = await fetch(
+    `/submit.php?email=${encodeURIComponent(email.trim().toLowerCase())}`
+  );
+
+  if (res.ok) return true;
+  if (res.status === 404) return false;
+  throw new Error(`Unexpected status  ${res.status}`);
 }
 
 const STATE = {
@@ -64,7 +61,7 @@ export default function LoginPage() {
   }
 
   function handleGoToAddRecord() {
-    router.push("/add-record"); // adjust route as needed
+    router.push("/AddRecord"); // adjust route as needed
   }
 
   /* Derive input style variant */
